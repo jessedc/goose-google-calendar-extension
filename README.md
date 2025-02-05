@@ -82,34 +82,117 @@ find_free_slots(
 )
 ```
 
-## Setup and Installation
+## First Time Setup
 
-1. **Set up Google Cloud Project:**
-   ```bash
-   # Create config directory
-   mkdir -p ~/.config/goose/calendar
-   
-   # Move credentials
-   mv ~/Downloads/credentials.json ~/.config/goose/calendar/
+### 1. Initial Configuration
+
+When you run the plugin for the first time, several things will happen:
+
+1. **OAuth2 Authentication Flow**
+   ```
+   The plugin will attempt to open your default web browser.
+   You'll be asked to:
+   1. Sign in to your Google Account
+   2. Review the permissions requested
+   3. Grant access to your calendar
    ```
 
-2. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
+2. **Token Storage**
+   - After successful authentication, the plugin will store your credentials
+   - Location: `~/.config/goose/calendar/token.json`
+   - This token will be reused for future requests
+   - The token automatically refreshes when expired
+
+### 2. Common First-Time Issues
+
+1. **Browser Doesn't Open**
+   ```
+   If the browser doesn't open automatically:
+   1. Look for a URL in the console output
+   2. Copy and paste it into your browser manually
+   3. Complete the authentication process
    ```
 
-3. **Install Plugin:**
-   ```bash
-   pip install -e .
+2. **Permission Errors**
+   ```
+   If you see permission errors:
+   1. Check that credentials.json is in ~/.config/goose/calendar/
+   2. Ensure the Google Calendar API is enabled in your Google Cloud Project
+   3. Verify your OAuth2 credentials are for a Desktop application
    ```
 
-## Authentication
+3. **Calendar Access Issues**
+   ```
+   If you can't access calendars:
+   1. Verify you're signed in with the correct Google account
+   2. Check calendar sharing settings
+   3. Ensure the Google Calendar API is enabled
+   ```
 
-The plugin uses OAuth2 for authentication:
-1. First use will open a browser window
-2. Log in with your Google account
-3. Grant calendar permissions
-4. Token is saved for future use
+### 3. Verifying Setup
+
+Run these commands to verify your setup:
+
+```python
+# 1. Check basic calendar access
+list_upcoming_events(max_results=1)
+
+# 2. Check free/busy querying
+find_free_slots(
+    start_date="today",
+    duration_minutes=30
+)
+
+# 3. Test event creation
+create_event(
+    summary="Test Event",
+    start_time="tomorrow at 10am",
+    duration_minutes=30,
+    description="Testing calendar access"
+)
+```
+
+### 4. Next Steps
+
+After successful setup:
+1. Configure your working hours
+2. Set your preferred timezone
+3. Share calendars with team members if needed
+4. Review calendar permissions
+
+### 5. Maintenance
+
+The plugin requires occasional maintenance:
+- Token refresh happens automatically
+- If you revoke access, you'll need to re-authenticate
+- Update the plugin when new versions are available
+- Monitor Google Cloud Console for API usage
+
+### 6. Troubleshooting
+
+If you encounter issues:
+
+1. **Token Issues**
+   ```bash
+   # Remove the token and re-authenticate
+   rm ~/.config/goose/calendar/token.json
+   # Run any calendar command to trigger re-authentication
+   ```
+
+2. **Permission Issues**
+   - Check Google Cloud Console
+   - Verify API is enabled
+   - Check OAuth2 consent screen settings
+
+3. **Calendar Access**
+   - Verify calendar sharing settings
+   - Check for correct email addresses
+   - Ensure sufficient calendar permissions
+
+4. **Rate Limiting**
+   - Monitor API usage in Google Cloud Console
+   - Implement request batching for bulk operations
+   - Add delay between requests if needed
 
 ## Common Use Cases
 
@@ -220,83 +303,3 @@ Planned features for this plugin:
 3. Preferred time ranges
 4. Multiple calendar support
 5. Meeting room booking
-
-## Ideas for Additional Goose Extensions
-
-### 1. Calendar Integration Extensions
-- **Microsoft Outlook Calendar**: Similar functionality for Microsoft 365
-- **Apple Calendar**: Native macOS calendar integration
-- **Calendly**: Automated scheduling and availability management
-- **Meeting Room Manager**: Smart conference room booking system
-
-### 2. Productivity Extensions
-- **Task Manager**: Integration with tools like Asana, Trello, or Jira
-- **Note Taking**: Connect with Evernote, OneNote, or Notion
-- **Time Tracking**: Integrate with Toggl, RescueTime, or other time trackers
-- **Document Management**: Google Drive, Dropbox, or OneDrive integration
-
-### 3. Communication Extensions
-- **Email Manager**: Gmail, Outlook, or other email service integration
-- **Chat Integration**: Slack, Microsoft Teams, or Discord
-- **Video Conferencing**: Zoom, Google Meet, or Teams meeting management
-- **Contact Manager**: Smart contact organization and scheduling
-
-### 4. Development Tools
-- **GitHub Manager**: Repository, PR, and issue management
-- **CI/CD Controller**: Pipeline management for various CI systems
-- **Code Review Assistant**: Automated code review scheduling
-- **Documentation Manager**: Auto-update documentation based on code changes
-
-### 5. Project Management
-- **Resource Scheduler**: Team capacity and resource allocation
-- **Sprint Planner**: Agile sprint planning assistance
-- **Timeline Manager**: Project timeline and milestone tracking
-- **Budget Tracker**: Project budget and resource cost tracking
-
-### 6. Smart Office Extensions
-- **Smart Light Controller**: Office lighting automation
-- **Temperature Control**: Smart thermostat integration
-- **Office Music**: Shared music playlist management
-- **Desk Booking**: Hot desk reservation system
-
-### 7. Knowledge Management
-- **Wiki Manager**: Team knowledge base organization
-- **Document Summarizer**: Auto-summarize documents and meetings
-- **Learning Resources**: Track and schedule training materials
-- **Research Assistant**: Literature and web research automation
-
-### 8. Analytics and Reporting
-- **Dashboard Creator**: Automated report generation
-- **Data Visualizer**: Create charts and graphs from data
-- **Metrics Tracker**: KPI and metrics monitoring
-- **Performance Reporter**: Automated performance report generation
-
-### 9. Customer Relationship
-- **CRM Integration**: Salesforce, HubSpot, or other CRM tools
-- **Support Ticket Manager**: Help desk and ticket scheduling
-- **Customer Meeting Scheduler**: Automated customer meeting setup
-- **Follow-up Manager**: Track and schedule follow-up actions
-
-### 10. Health and Wellness
-- **Break Scheduler**: Smart break and rest period planning
-- **Exercise Planner**: Workout scheduling around meetings
-- **Mental Health**: Meditation and mindfulness session scheduling
-- **Team Building**: Automated team activity planning
-
-Each of these extensions could leverage Goose's capabilities to:
-- Automate repetitive tasks
-- Integrate multiple services
-- Provide natural language interfaces
-- Handle complex scheduling and coordination
-- Manage permissions and access control
-- Generate reports and analytics
-- Facilitate team collaboration
-
-Development Considerations:
-1. Focus on user experience and natural language interaction
-2. Implement robust error handling and recovery
-3. Consider security and privacy implications
-4. Design for extensibility and modularity
-5. Include comprehensive documentation
-6. Add testing and validation
-7. Consider cross-platform compatibility
